@@ -157,6 +157,18 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class ConsumeViewSet(viewsets.ModelViewSet):
     queryset = Consume.objects.all()
     serializer_class = ConsumeSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['book']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        return queryset.filter(
+            book__in=[Authority.book.id for Authority in Authority.objects
+                      .filter(user=self.request.user)
+                      .exclude(authority=Authority.LEAVE)]
+        )
 
 
 class ProportionViewSet(viewsets.ModelViewSet):
