@@ -140,6 +140,18 @@ class AuthorityViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['book']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        return queryset.filter(
+            book__in=[Authority.book.id for Authority in Authority.objects
+                      .filter(user=self.request.user)
+                      .exclude(authority=Authority.LEAVE)]
+        )
 
 
 class ConsumeViewSet(viewsets.ModelViewSet):
