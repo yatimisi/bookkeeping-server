@@ -80,6 +80,15 @@ class AuthorityViewSet(viewsets.ModelViewSet):
     queryset = Authority.objects.all()
     serializer_class = AuthoritySerializer
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        return queryset.filter(
+            book__in=[Authority.book.id for Authority in Authority.objects
+                      .filter(user=self.request.user)
+                      .exclude(authority=Authority.LEAVE)]
+        )
+
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
