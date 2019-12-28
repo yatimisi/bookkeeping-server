@@ -51,6 +51,7 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     'corsheaders',
     'django_cleanup',
+    'django_filters',
     'rest_framework',
     'rest_framework.authtoken',
 ]

@@ -1,10 +1,12 @@
 from django.shortcuts import render
 from django.http import Http404
+from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.exceptions import PermissionDenied
 
 from .models import (
     AccountBook,
@@ -13,6 +15,7 @@ from .models import (
     Consume,
     Proportion,
 )
+from .permissions import IsCurrentUser
 from .serializers import (
     AccountBookSerializer,
     AuthoritySerializer,
@@ -26,6 +29,7 @@ from rest_framework.generics import get_object_or_404
 class AccountBookViewSet(viewsets.ModelViewSet):
     queryset = AccountBook.objects.all()
     serializer_class = AccountBookSerializer
+    permission_classes = [IsAuthenticated, IsCurrentUser]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -79,6 +83,9 @@ class AccountBookViewSet(viewsets.ModelViewSet):
 class AuthorityViewSet(viewsets.ModelViewSet):
     queryset = Authority.objects.all()
     serializer_class = AuthoritySerializer
+    permission_classes = [IsAuthenticated, IsCurrentUser]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['book']
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -88,6 +95,19 @@ class AuthorityViewSet(viewsets.ModelViewSet):
                       .filter(user=self.request.user)
                       .exclude(authority=Authority.LEAVE)]
         )
+
+    def perform_create(self, serializer):
+        book = get_object_or_404(AccountBook,
+                                 pk=serializer.validated_data['book'].id)
+        authorities = Authority.objects\
+            .filter(user=self.request.user)\
+            .filter(book=book)
+
+        if not authorities or authorities.first().authority in [Authority.CREATOR, Authority.WRITER]:
+            super().perform_create(serializer)
+            return
+
+        raise PermissionDenied('Cannot post.')
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
