@@ -15,6 +15,13 @@ class AuthoritySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ModifyAuthoritySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Authority
+        fields = '__all__'
+        read_only_fields = ('user', 'book',)
+
+
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category

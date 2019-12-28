@@ -4,7 +4,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 
@@ -19,6 +19,7 @@ from .permissions import IsCurrentUser
 from .serializers import (
     AccountBookSerializer,
     AuthoritySerializer,
+    ModifyAuthoritySerializer,
     CategorySerializer,
     ConsumeSerializer,
     ProportionSerializer,
@@ -95,6 +96,15 @@ class AuthorityViewSet(viewsets.ModelViewSet):
                       .filter(user=self.request.user)
                       .exclude(authority=Authority.LEAVE)]
         )
+
+    def get_serializer_class(self):
+        if self.action in SAFE_METHODS:
+            return super().get_serializer_class()
+
+        if self.action == 'create':
+            return
+
+        return ModifyAuthoritySerializer
 
     def perform_create(self, serializer):
         book = get_object_or_404(AccountBook,
