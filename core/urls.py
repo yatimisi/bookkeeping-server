@@ -13,6 +13,13 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from app.accounts.views import(
+    AccountBookViewSet,
+    AuthorityViewSet,
+    CategoryViewSet,
+    ConsumeViewSet,
+    ProportionViewSet,
+)
 from app.users.views import UserViewSet
 
 from core.settings import MEDIA_ROOT, MEDIA_URL
@@ -31,6 +38,11 @@ from rest_framework_simplejwt.views import (
 
 router = routers.DefaultRouter()
 router.trailing_slash = ''
+router.register('accountbooks', AccountBookViewSet)
+router.register('authorities', AuthorityViewSet)
+router.register('consume', ConsumeViewSet)
+router.register('proportion', ProportionViewSet)
+router.register('categories', CategoryViewSet)
 router.register('users', UserViewSet)
 
 urlpatterns = [
