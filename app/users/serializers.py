@@ -9,7 +9,6 @@ from .models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-
         fields = (
             'id',
             'email',
@@ -18,17 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
         )
-
-
-class ProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-
-        fields = (
-            'profile',
-            'first_name',
-            'last_name',
-        )
+        read_only_fields = ('email',)
 
 
 # class PasswordSetSerializer(serializers.Serializer):
