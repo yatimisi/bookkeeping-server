@@ -46,6 +46,35 @@ class AccountBookViewSet(viewsets.ModelViewSet):
 
         authority.save()
 
+    def perform_destroy(self, instance):
+        authority = Authority.objects.filter(
+            user=self.request.user).filter(book=instance).first().authority
+
+        if authority is Authority.CREATOR:
+            super().perform_destroy(instance)
+            return
+
+        self.leave(self.request.user, book=instance.id)
+
+    @action(
+        ['POST'],
+        False,
+        'leave/(?P<book>[^/.]+)',
+        permission_classes=[IsAuthenticated]
+    )
+    def leave(self, request, book):
+        account_book = get_object_or_404(AccountBook, pk=book)
+        authority = get_object_or_404(Authority,
+                                      user=self.request.user,
+                                      book=account_book)
+
+        authority.authority = Authority.LEAVE
+        authority.save()
+
+        return Response({
+            'success': True,
+        })
+
 
 class AuthorityViewSet(viewsets.ModelViewSet):
     queryset = Authority.objects.all()
