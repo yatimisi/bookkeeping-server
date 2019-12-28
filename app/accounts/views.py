@@ -170,7 +170,22 @@ class ConsumeViewSet(viewsets.ModelViewSet):
                       .exclude(authority=Authority.LEAVE)]
         )
 
+    def perform_create(self, serializer):
+        consume = serializer.save()
+        print(consume)
+
+        proportion = Proportion.objects.create(
+            fee=0,
+            username=consume.creator,
+            consume=consume,
+        )
+
+        proportion.save()
+
 
 class ProportionViewSet(viewsets.ModelViewSet):
     queryset = Proportion.objects.all()
     serializer_class = ProportionSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['consume']
