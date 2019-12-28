@@ -27,6 +27,15 @@ class AccountBookViewSet(viewsets.ModelViewSet):
     queryset = AccountBook.objects.all()
     serializer_class = AccountBookSerializer
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        return queryset.filter(
+            id__in=[Authority.book.id for Authority in Authority.objects
+                    .filter(user=self.request.user)
+                    .exclude(authority=Authority.LEAVE)]
+        )
+
 
 class AuthorityViewSet(viewsets.ModelViewSet):
     queryset = Authority.objects.all()
