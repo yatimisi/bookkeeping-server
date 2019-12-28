@@ -36,6 +36,16 @@ class AccountBookViewSet(viewsets.ModelViewSet):
                     .exclude(authority=Authority.LEAVE)]
         )
 
+    def perform_create(self, serializer):
+        account_book = serializer.save()
+
+        authority = Authority.objects.create(
+            user=self.request.user,
+            book=account_book,
+        )
+
+        authority.save()
+
 
 class AuthorityViewSet(viewsets.ModelViewSet):
     queryset = Authority.objects.all()
