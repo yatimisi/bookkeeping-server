@@ -159,7 +159,7 @@ class ConsumeViewSet(viewsets.ModelViewSet):
     serializer_class = ConsumeSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['book']
+    filterset_fields = ['book', 'is_repay']
 
     def get_queryset(self):
         queryset = super().get_queryset()
