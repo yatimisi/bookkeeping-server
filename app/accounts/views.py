@@ -83,7 +83,7 @@ class AccountBookViewSet(viewsets.ModelViewSet):
 class AuthorityViewSet(viewsets.ModelViewSet):
     queryset = Authority.objects.all()
     serializer_class = AuthoritySerializer
-    permission_classes = [IsAuthenticated, IsCurrentUser]
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['book']
 
@@ -108,6 +108,23 @@ class AuthorityViewSet(viewsets.ModelViewSet):
             return
 
         raise PermissionDenied('Cannot post.')
+
+    def perform_destroy(self, instance):
+        me = Authority.objects\
+            .filter(user=self.request.user)\
+            .filter(book=instance.book).first()
+
+        authority = Authority.objects.get(pk=instance.id)
+
+        if instance.user != self.request.user and \
+            me.authority <= instance.authority and \
+            (Authority.objects.filter(book=authority.book).count() > 1 or
+             instance.authority is not Authority.CREATOR):
+            authority.authority = Authority.LEAVE
+            authority.save()
+            return
+
+        raise PermissionDenied('Cannot delete.')
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
