@@ -12,6 +12,7 @@ django-cors-headers = "*"
 django-environ = "*"
 djangorestframework = "*"
 pillow = "*"
+djangorestframework-simplejwt = "*"
 
 [requires]
 python_version = "3.7"
