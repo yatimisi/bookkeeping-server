@@ -30,7 +30,7 @@ from rest_framework.generics import get_object_or_404
 class AccountBookViewSet(viewsets.ModelViewSet):
     queryset = AccountBook.objects.all()
     serializer_class = AccountBookSerializer
-    permission_classes = [IsAuthenticated, IsCurrentUser]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -102,7 +102,7 @@ class AuthorityViewSet(viewsets.ModelViewSet):
             return super().get_serializer_class()
 
         if self.action == 'create':
-            return
+            return super().get_serializer_class()
 
         return ModifyAuthoritySerializer
 
