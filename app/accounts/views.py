@@ -173,13 +173,13 @@ class ConsumeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         consume = serializer.save()
 
-        proportion = Proportion.objects.create(
-            fee=0,
-            username=consume.creator,
-            consume=consume,
-        )
+        # proportion = Proportion.objects.create(
+        #     fee=0,
+        #     username=consume.creator,
+        #     consume=consume,
+        # )
 
-        proportion.save()
+        # proportion.save()
 
 
 class ProportionViewSet(viewsets.ModelViewSet):
